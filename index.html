@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#ffffff"><meta name="apple-mobile-web-app-capable" content="yes">
+<title>Golf</title>
+<style>
+*{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:#fff;color:#1c1c1e;user-select:none}
+#app{max-width:440px;margin:0 auto;padding:6px 8px 90px}
+h1{font-size:20px;margin:10px 2px;font-weight:900}h2{font-size:14px;margin:16px 2px 6px;text-transform:uppercase;letter-spacing:.4px;font-weight:800}
+.hd{display:flex;align-items:center;justify-content:space-between;padding:4px 2px 8px;border-bottom:1px solid #e5e5ea}
+.hd b{font-size:15px}.hn{font-size:40px;font-weight:900;line-height:1}.tg{font-size:13px;font-weight:800;line-height:1.15}
+.run{font-size:13px;font-weight:700;color:#636366;margin:6px 2px}
+.blk{background:#f2f2f7;border-radius:10px;padding:8px 10px;margin-top:8px}
+.lbl{font-size:13px;font-weight:800;text-transform:uppercase;margin-bottom:6px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.box{height:78px;background:#fff;border:1px solid #d1d1d6;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.box b{font-size:38px;line-height:1}.box i{font-size:11px;font-style:normal;font-weight:800;color:#636366;margin-top:2px}
+.box.off{opacity:.4}.tot{background:#e5e5ea;border:1.5px solid #8e8e93;border-radius:10px;padding:8px 10px;margin-top:8px}
+.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;padding:8px 8px calc(8px + env(safe-area-inset-bottom));display:flex;gap:8px;max-width:440px;margin:0 auto;border-top:1px solid #e5e5ea}
+button{border:0;border-radius:8px;height:50px;font-size:14px;font-weight:800;background:#e5e5ea;color:#000;padding:0 12px}
+.bar button{flex:1}.bar .go{flex:2;background:#1c1c1e;color:#fff}.pri{background:#1c1c1e;color:#fff}
+.err{background:#ffe5e5;color:#a00;border-radius:8px;padding:10px;margin:8px 0;font-weight:700;font-size:14px}
+.ok{background:#e3f6e8;color:#116b2b;border-radius:8px;padding:10px;margin:8px 0;font-weight:700;font-size:14px}
+input,select{width:100%;height:48px;font-size:17px;border:1px solid #d1d1d6;border-radius:8px;padding:0 10px;background:#fff;margin-bottom:8px;user-select:text}
+.card{background:#f2f2f7;border-radius:10px;padding:10px;margin-bottom:8px}.card p{margin:0 0 8px;font-size:15px}
+.row{display:flex;gap:6px}.row button{flex:1;height:44px}
+.mini{flex:0 0 auto!important;height:44px;font-size:12px;padding:0 10px;background:#f2f2f7;color:#8e8e93}
+.tbox{flex:1;background:#1c1c1e;border-radius:12px;padding:14px 8px;text-align:center}
+.tl{color:#a2a2a7;font-size:12px;font-weight:800;text-transform:uppercase}
+.tv{color:#fff;font-size:38px;font-weight:900;line-height:1.2}
+.tvs{color:#d1d1d6;font-size:16px;font-weight:800;margin-top:2px}
+table.tbl{width:100%;border-collapse:collapse;background:#f2f2f7;border-radius:12px;overflow:hidden;margin-top:6px}
+table.tbl th{background:#e5e5ea;font-size:12px;font-weight:800;text-transform:uppercase;padding:8px 6px;text-align:center}
+table.tbl th:first-child{text-align:left}
+table.tbl td{font-size:16px;font-weight:600;padding:8px 6px;text-align:center;border-top:1px solid #e5e5ea}
+table.tbl td:first-child{text-align:left;font-weight:700}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9}
+.sh{position:fixed;left:0;right:0;bottom:0;background:#fff;border-radius:18px 18px 0 0;padding:12px 12px calc(12px + env(safe-area-inset-bottom));max-height:70vh;overflow:auto;max-width:440px;margin:0 auto;z-index:10}
+.sh h3{margin:0 0 8px;font-size:13px;color:#8e8e93;text-align:center;text-transform:uppercase}
+.gr{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.gr button{height:56px;font-size:22px;background:#f2f2f7}.gr .sel{background:#007aff;color:#fff}.gr .dn{background:#1c1c1e;color:#fff}
+</style></head><body><div id="app"></div>
+<script>
+const CANCHAS={
+  "Palermo GC (Blancas)":[[4,9],[4,7],[4,13],[4,3],[3,11],[5,1],[3,17],[4,15],[4,5],[3,16],[5,14],[4,6],[3,18],[5,2],[4,8],[5,12],[4,4],[4,10]],
+  "CUBA Fátima (Blanca)":[[5,5],[3,15],[4,1],[5,11],[4,9],[4,7],[3,17],[4,3],[4,13],[4,12],[5,6],[4,4],[4,8],[3,16],[4,2],[4,10],[3,18],[5,14]],
+  "San Patricio (Azules)":[[4,7],[4,5],[3,17],[5,11],[4,9],[5,1],[4,3],[3,15],[4,13],[5,6],[3,14],[5,2],[4,12],[4,8],[3,18],[4,16],[4,10],[4,4]],
+  "Martindale (Blancas)":[[4,7],[4,5],[5,1],[3,15],[5,3],[3,17],[4,11],[4,13],[4,9],[4,12],[3,18],[5,2],[4,4],[4,14],[3,16],[4,6],[5,8],[4,10]],
+  "San Nicolas (Azules)":[[4,7],[3,9],[4,3],[4,11],[5,13],[3,15],[4,5],[5,17],[4,1],[5,16],[3,8],[5,18],[4,12],[4,2],[3,6],[5,14],[3,10],[4,4]],
+  "Saint Thomas Este(Blancas)":[[5,7],[4,5],[4,17],[3,11],[3,3],[4,15],[4,13],[4,1],[4,9],[3,12],[4,2],[4,10],[4,16],[3,8],[4,4],[4,6],[3,14],[5,18]],
+  "Saint Thomas Norte(Blancas)":[[4,6],[3,12],[4,10],[4,4],[3,14],[5,2],[3,16],[4,8],[4,18],[3,13],[4,7],[4,11],[4,9],[4,5],[3,15],[5,1],[3,17],[5,18]],
+  "Ituzaingo (Blancas)":[[4,13],[5,1],[4,15],[3,17],[4,3],[4,11],[4,5],[4,9],[3,7],[4,2],[4,8],[3,6],[5,4],[4,12],[4,14],[5,6],[3,18],[4,10]]
+};
+const ETQ=['Eagle','Birdie','Par','Bogey','Doble+'];
+const KEY='golf_v1';
+
+let db;
+try{
+  db=JSON.parse(localStorage.getItem(KEY)||'null');
+}catch(e){
+  db=null;
+}
+
+if(!db||typeof db!=='object'||!db.rondas){
+  db={
+    actual:null,
+    rondas:{},
+    pref:{yo:'',amigo:''},
+    tips:{
+      rutina:['','','','',''],
+      s23:['','','','',''],
+      apch:['','','','',''],
+      putts:['','','','','']
+    }
+  };
+}
+
+if(!db.pref)db.pref={yo:'',amigo:''};
+if(!db.tips){
+  db.tips={
+    rutina:['','','','',''],
+    s23:['','','','',''],
+    apch:['','','','',''],
+    putts:['','','','','']
+  };
+}
+
+let vista='home',
+    resumenTipo='ida',
+    picker=null,
+    irA=false,
+    salirSheet=false,
+    editarObjetivosId=null,
+    msg='',
+    ok='',
+    vistaAnterior=null;
+
+const $=s=>document.getElementById(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const signo=n=>n>0?'+'+n:n<0?String(n):'E';
+const etiqueta=d=>d<=-2?'Eagle':d===-1?'Birdie':d===0?'Par':d===1?'Bogey':'Doble+';
+
+function redondearMitad(n){
+  const f=Math.floor(n),d=n-f;
+  if(d<0.5)return f;
+  if(d>0.5)return f+1;
+  return f%2===0?f:f+1;
+}
+
+function targetTramo(r,esFinal){
+  const t=r.objetivo||{putt:33,apch:24,s23:28,pen:0};
+  if(esFinal)return t;
+  return {
+    putt:redondearMitad(t.putt/2),
+    apch:redondearMitad(t.apch/2),
+    s23:redondearMitad(t.s23/2),
+    pen:redondearMitad(t.pen/2)
+  };
+}
+
+function sumaCat(hoyos,r,campo){
+  return hoyos.reduce((s,i)=>{
+    let v=r.h[i][campo]||0;
+    if(campo==='s'&&par(i)===3)v=0;
+    return s+v;
+  },0);
+}
+
+function save(){
+  try{
+    localStorage.setItem(KEY,JSON.stringify(db));
+  }catch(e){
+    msg='No se pudo guardar en el celular: '+e.message;
+  }
+}
+
+const R=()=>db.rondas[db.actual];
+const par=n=>CANCHAS[R().cancha][n-1][0];
+const hcp=n=>CANCHAS[R().cancha][n-1][1];
+
+function H(n){
+  const r=R();
+  return r.h[n]||(r.h[n]={pp:0,pg:0,ay:0,ag:0,pen:0,s:0,am:0,ok:0});
+}
+
+const mio=(n)=>{
+  const h=H(n);
+  return h.pg+h.ag+(par(n)==3?0:h.s)+h.pen;
+};
+
+function hayAmigo(){
+  const r=R();
+  return !!(r.amigo&&r.tieneAmigo);
+}
+
+function hoyosJugados(hasta){
+  const r=R(),res=[];
+  for(let i=1;i<=hasta;i++){
+    if(r.h[i]&&r.h[i].ok)res.push(i);
+  }
+  return res;
+}
+
+function nueva(){
+  const c=$('cancha').value;
+  const yo=$('yo').value.trim()||'YO';
+  const am=$('amigo').value.trim();
+  const objetivo={
+    putt:+$('t_putt').value||0,
+    apch:+$('t_apch').value||0,
+    s23:+$('t_s23').value||0,
+    pen:+$('t_pen').value||0
+  };
+  const id=new Date().toISOString();
+  db.pref={yo:yo==='YO'?'':yo,amigo:am,objetivo};
+  db.rondas[id]={
+    id:id,
+    fecha:new Date().toISOString(),
+    cancha:c,
+    yo:yo,
+    amigo:am,
+    tieneAmigo:!!am,
+    objetivo:objetivo,
+    hoyo:1,
+    h:{}
+  };
+  db.actual=id;
+  vista='hoyo';
+  msg='';
+  ok='';
+  save();
+  render();
+}
+
+function setAmigo(v){
+  const r=R();
+  r.amigo=v.trim();
+  r.tieneAmigo=!!r.amigo;
+  save();
+  render();
+}
+
+function continuar(id){
+  db.actual=id;
+  vista='hoyo';
+  msg='';
+  ok='';
+  irA=false;
+  save();
+  render();
+}
+
+function pedirSalir(){
+  salirSheet=true;
+  render();
+}
+
+function cancelarSalir(){
+  salirSheet=false;
+  render();
+}
+
+async function confirmarSalirGuardando(){
+  if(db.actual)await exportar(db.actual,false);
+  cerrarApp();
+}
+
+function confirmarSalirSinGuardar(){
+  cerrarApp();
+}
+
+function cerrarApp(){
+  salirSheet=false;
+  window.close();
+  vista='home';
+  ok='Ya podes cerrar esta pestania. Tus datos quedan guardados en el celular igual.';
+  save();
+  render();
+}
+
+function pick(k,t,min,max,step){
+  picker={k:k,t:t,min:min,max:max,step:step};
+  render();
+}
+
+function setv(v){
+  H(R().hoyo)[picker.k]=v;
+  picker=null;
+  msg='';
+  save();
+  render();
+}
+
+function abrirTips(){
+  vistaAnterior=vista;
+  vista='tips';
+  render();
+}
+
+function volverTips(){
+  save();
+  vista=vistaAnterior||'hoyo';
+  render();
+}
+
+function actualizarTip(cat,i,val){
+  db.tips[cat][i]=val;
+  save();
+}
+
+function ir(n){
+  const r=R();
+  if(r.volverA==null&&r.hoyo!==n)r.volverA=r.hoyo;
+  r.hoyo=n;
+  irA=false;
+  vista='hoyo';
+  msg='';
+  save();
+  render();
+}
+
+function confirmar(){
+  const r=R(),n=r.hoyo,h=H(n),f=[];
+  if(!(h.ag>0))f.push('APCH');
+  if(par(n)!=3&&!(h.s>0))f.push('S+2+3');
+  if(f.length){
+    msg='No se puede avanzar. Falta: '+f.join(' · ');
+    render();
+    return;
+  }
+  h.ok=1;
+  msg='';
+  if(r.volverA!=null){
+    r.hoyo=r.volverA;
+    r.volverA=null;
+  }else if(n===9){
+    resumenTipo='ida';
+    vista='resumen';
+  }else if(n===18){
+    resumenTipo='final';
+    vista='resumen';
+  }else{
+    r.hoyo=n+1;
+  }
+  save();
+  render();
+}
+
+function continuarDesdeResumen(){
+  const r=R();
+  r.hoyo=Math.min(r.hoyo+1,18);
+  vista='hoyo';
+  save();
+  render();
+}
+
+function verControl(){
+  vista='control';
+  render();
+}
+
+function volverAResumen(){
+  vista='resumen';
+  render();
+}
+
+function irInicio(){
+  vista='home';
+  save();
+  render();
+}
+
+function borrar(id){
+  if(confirm('¿Borrar esta ronda del celular? No se puede deshacer.')){
+    delete db.rondas[id];
+    if(db.actual===id)db.actual=null;
+    save();
+    render();
+  }
+}
+
+function abrirEditarObj(id){
+  editarObjetivosId=id;
+  msg='';
+  ok='';
+  render();
+}
+
+function cancelarEditarObj(){
+  editarObjetivosId=null;
+  render();
+}
+
+function guardarObjetivos(){
+  const r=db.rondas[editarObjetivosId];
+  if(!r){
+    editarObjetivosId=null;
+    render();
+    return;
+  }
+  r.objetivo={
+    putt:+$('e_putt').value||0,
+    apch:+$('e_apch').value||0,
+    s23:+$('e_s23').value||0,
+    pen:+$('e_pen').value||0
+  };
+  db.pref.objetivo=r.objetivo;
+  editarObjetivosId=null;
+  ok='Objetivos actualizados.';
+  save();
+  render();
+}
+
+function importarArchivo(e){
+  const file=e.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    try{
+      const r=JSON.parse(ev.target.result);
+      if(!r.id||!r.cancha||!r.h||!CANCHAS[r.cancha])throw new Error('el archivo no tiene el formato esperado');
+      db.rondas[r.id]=r;
+      db.actual=r.id;
+      const n=Object.values(r.h).filter(x=>x.ok).length;
+      vista=n<18?'hoyo':'home';
+      ok=n<18?'':'Ronda importada.';
+      msg='';
+      save();
+      render();
+    }catch(err){
+      msg='No se pudo importar el archivo: '+err.message;
+      render();
+    }
+  };
+  reader.readAsText(file);
+  e.target.value='';
+}
+
+async function exportar(id,compartir){
+  const r=db.rondas[id];
+  const nom='ronda_'+r.fecha.slice(0,10)+'_'+r.fecha.slice(11,16).replace(':','')+'_'+r.yo.replace(/\W+/g,'_')+'.json';
+  const blob=new Blob([JSON.stringify(r,null,2)],{type:'application/json'});
+  const file=new File([blob],nom,{type:'application/json'});
+  if(compartir&&navigator.canShare&&navigator.canShare({files:[file]})){
+    try{
+      await navigator.share({files:[file],title:nom});
+      return;
+    }catch(e){
+      if(e.name==='AbortError')return;
+    }
+  }
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=nom;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+}
+
+const box=(k,t,v,lbl,off)=>`<div class="box${off?' off':''}" ${off?'':`onclick="pick('${k}','${t}',${k=='am'?'0,15,1':'0,10,1'})"`}><b>${v||(k=='am'?'—':0)}</b><i>${lbl}</i></div>`;
+
+const boxWide=(k,t,v,lbl)=>`<div class="box" style="width:100%" onclick="pick('${k}','${t}',${k=='pg'?'0,40,1':'0,10,1'})"><b>${v||0}</b><i>${lbl}</i></div>`;
+
+function vHome(){
+  const ids=Object.keys(db.rondas).sort().reverse();
+  return `<h1>Golf</h1>${ok?`<div class=ok>${ok}</div>`:''}${msg?`<div class=err>${esc(msg)}</div>`:''}
+  <h2>Nueva ronda</h2>
+  <select id=cancha>${Object.keys(CANCHAS).map(c=>`<option>${esc(c)}</option>`).join('')}</select>
+  <input id=yo placeholder="Tu nombre" value="${esc(db.pref.yo||'')}">
+  <input id=amigo placeholder="Amigo (opcional)" value="${esc(db.pref.amigo||'')}">
+  <h2>Tu objetivo (18 hoyos)</h2>
+  <p style="font-size:13px;color:#636366;margin:0 0 8px">Repartilo como quieras. En el resumen del hoyo 9 se usa la mitad de cada valor.</p>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:8px">
+    <div><label style="font-size:11px;font-weight:800;color:#636366">PUTT</label><input id=t_putt type=number min=0 style="height:44px;padding:0 6px" value="${(db.pref.objetivo&&db.pref.objetivo.putt)??33}"></div>
+    <div><label style="font-size:11px;font-weight:800;color:#636366">APCH</label><input id=t_apch type=number min=0 style="height:44px;padding:0 6px" value="${(db.pref.objetivo&&db.pref.objetivo.apch)??24}"></div>
+    <div><label style="font-size:11px;font-weight:800;color:#636366">S+2+3</label><input id=t_s23 type=number min=0 style="height:44px;padding:0 6px" value="${(db.pref.objetivo&&db.pref.objetivo.s23)??28}"></div>
+    <div><label style="font-size:11px;font-weight:800;color:#636366">PEN</label><input id=t_pen type=number min=0 style="height:44px;padding:0 6px" value="${(db.pref.objetivo&&db.pref.objetivo.pen)??0}"></div>
+  </div>
+  <button class=pri style="width:100%" onclick="nueva()">Empezar ronda</button>
+  <h2>Rondas guardadas en este celular</h2>
+  ${ids.length?'':'<p>Todavía no hay rondas.</p>'}
+  ${ids.map(id=>{
+    const r=db.rondas[id];
+    const n=Object.values(r.h).filter(x=>x.ok).length;
+    return `<div class=card><p><b>${r.fecha.slice(8,10)}/${r.fecha.slice(5,7)}/${r.fecha.slice(0,4)} ${new Date(r.fecha).toTimeString().slice(0,5)}</b><br>${esc(r.yo)}${r.tieneAmigo?' vs '+esc(r.amigo):''} · ${esc(r.cancha)}<br>${n}/18 hoyos${n<18&&n>0?` · sigue en el ${r.hoyo}`:''}${n>=18?' · completa':''}</p>
+    <div class=row><button class=pri onclick="continuar('${id}')">${n<18?'Continuar':'Abrir'}</button><button onclick="abrirEditarObj('${id}')">🎯</button><button onclick="exportar('${id}',true)">Compartir</button><button onclick="exportar('${id}',false)">Descargar</button><button onclick="borrar('${id}')">✕</button></div></div>`;
+  }).join('')}
+  <h2>Restaurar desde un archivo</h2>
+  <p style="font-size:13px;color:#636366;margin:0 0 8px">Si el celular se traba o perdiste una ronda, elegi un .json que hayas exportado antes.</p>
+  <input type=file id=importFile accept="application/json" style="display:none" onchange="importarArchivo(event)">
+  <button style="width:100%;margin-bottom:8px" onclick="document.getElementById('importFile').click()">Importar ronda (.json)</button>
+  <button class=mini style="width:100%" onclick="pedirSalir()">Salir</button>`;
+}
+
+function vHoyo(){
+  const r=R(),n=r.hoyo,h=H(n),p=par(n);
+  let tot=0,totA=0,pp=0,jugados=0;
+  for(let i=1;i<=18;i++){
+    const x=r.h[i];
+    if(x&&x.ok){
+      tot+=mio(i);
+      pp+=par(i);
+      jugados++;
+      if(r.tieneAmigo)totA+=(x.am||0);
+    }
+  }
+  return `<div class=hd><b>${esc(r.cancha)}</b><span class=hn>${n}</span><span class=tg>PAR ${p}<br>HCP ${hcp(n)}</span></div>
+  <div class=run>${esc(r.yo)}: ${tot} (${signo(tot-pp)})${r.tieneAmigo?` · ${esc(r.amigo)}: ${totA} (${signo(totA-pp)})`:''} · ${jugados}/18${h.ok?' · hoyo ya confirmado':''}</div>
+  ${r.volverA!=null?`<div class=ok>Corrigiendo el hoyo ${n}. Al confirmar, volves al hoyo ${r.volverA}.</div>`:''}
+  ${msg?`<div class=err>${esc(msg)}</div>`:''}
+  <div class=blk><div class=lbl>⛳ Putts</div>${boxWide('pg','GOLPES PUTT',h.pg,'GOLPES')}</div>
+  <div class=blk><div class=lbl>🎯 APCH</div>${boxWide('ag','GOLPES APCH',h.ag,'GOLPES')}</div>
+  <div class=blk><div class=g2><div class=lbl>Penalties</div><div class=lbl>🏌️ S+2+3</div></div><div class=g2>${box('pen','PENALTIES',h.pen,'GOLPES NETOS')}${box('s','GOLPES S+2+3',p==3?0:h.s,'GOLPES',p==3)}</div></div>
+  ${!r.amigo?`<div class=blk><div class=lbl>👥 Nombre del amigo</div><input placeholder="Escribí el nombre de tu amigo" onchange="setAmigo(this.value)"></div>`:''}
+  <div class=tot><div class=g2>
+  <div><div class=lbl>👥 ${esc(r.amigo||'Amigo')}</div>${box('am','TOTAL '+esc(r.amigo||'Amigo'),h.am,'TOTAL')}</div>
+  <div><div class=lbl>👤 ${esc(r.yo)}</div><div class=box><b>${mio(n)}</b><i>TOTAL</i></div></div>
+  </div></div>
+  <div class=bar><button onclick="pedirSalir()">✕ SALIR</button><button onclick="irA=true;render()">IR A…</button><button onclick="abrirTips()">TIPS</button><button class=go onclick="confirmar()">CONFIRMAR Y AVANZAR ➔</button></div>`;
+}
+
+function vResumen(){
+  const r=R(),hasta=resumenTipo==='ida'?9:18,hoyos=hoyosJugados(hasta),amigo=hayAmigo(),esFinal=hasta>=18;
+  const parTot=hoyos.reduce((s,i)=>s+par(i),0);
+  const mioTot=hoyos.reduce((s,i)=>s+mio(i),0);
+  const amigoTot=amigo?hoyos.reduce((s,i)=>s+(r.h[i].am||0),0):0;
+  const resM={},resA={};
+  ETQ.forEach(e=>{resM[e]=0;resA[e]=0});
+  hoyos.forEach(i=>{
+    resM[etiqueta(mio(i)-par(i))]++;
+    if(amigo)resA[etiqueta((r.h[i].am||0)-par(i))]++;
+  });
+  const filasResultados=ETQ.map(e=>`<tr><td>${e}</td>${amigo?`<td>${resA[e]}</td>`:''}<td>${resM[e]}</td></tr>`).join('');
+  const target=targetTramo(r,esFinal);
+  const realPutt=sumaCat(hoyos,r,'pg');
+  const realApch=sumaCat(hoyos,r,'ag');
+  const realS23=sumaCat(hoyos,r,'s');
+  const realPen=sumaCat(hoyos,r,'pen');
+  const targetTotal=target.putt+target.apch+target.s23+target.pen;
+  const filasObjetivo=[
+    ['PUTT',realPutt,target.putt],
+    ['APCH',realApch,target.apch],
+    ['S+2+3',realS23,target.s23],
+    ['PEN',realPen,target.pen],
+    ['TOTAL',mioTot,targetTotal]
+  ].map(x=>`<tr><td>${x[0]}</td><td>${x[1]}</td><td>${x[2]}</td><td>${signo(x[1]-x[2])}</td></tr>`).join('');
+  return `<h1>${resumenTipo==='ida'?'RESUMEN IDA':'RESUMEN FINAL'}</h1><div class=run>${esc(r.cancha)} · ${hoyos.length} hoyos cargados</div>
+  <div class=g2 style="margin-top:10px">
+  ${amigo?`<div class=tbox><div class=tl>${esc(r.amigo)}</div><div class=tv>${amigoTot}</div><div class=tvs>${signo(amigoTot-parTot)}</div></div>`:''}
+  <div class=tbox><div class=tl>${esc(r.yo)}</div><div class=tv>${mioTot}</div><div class=tvs>${signo(mioTot-parTot)}</div></div>
+  </div>
+  <h2>Resultados</h2><table class=tbl><tr><th>Tipo</th>${amigo?`<th>${esc(r.amigo)}</th>`:''}<th>${esc(r.yo)}</th></tr>${filasResultados}</table>
+  <h2>Tu juego vs. objetivo</h2><table class=tbl><tr><th></th><th>${esc(r.yo)}</th><th>Target</th><th>Diff</th></tr>${filasObjetivo}</table>
+  <div class=row style="margin-top:14px">
+    <button class=mini onclick="pedirSalir()">Salir</button>
+    <button onclick="verControl()">Control</button>
+    ${esFinal?`<button class=go style="flex:2" onclick="exportar(db.actual,true)">Exportar</button>`:`<button class=go style="flex:2" onclick="continuarDesdeResumen()">Continuar →</button>`}
+  </div>
+  ${esFinal?`<button style="width:100%;margin-top:8px" onclick="irInicio()">Volver al inicio</button>`:''}`;
+}
+
+function vControl(){
+  const r=R(),hasta=resumenTipo==='ida'?9:18,hoyos=hoyosJugados(hasta),amigo=hayAmigo();
+  const filas=hoyos.map(i=>`<tr><td><b>${i}</b></td><td><b>${par(i)}</b></td>${amigo?`<td><b>${r.h[i].am||0}</b></td>`:''}<td><b>${mio(i)}</b></td></tr>`).join('');
+  return `<h1>CONTROL POR HOYO</h1><div class=run>${esc(r.cancha)}</div>
+  <table class=tbl><tr><th>Hoyo</th><th>Par</th>${amigo?`<th>${esc(r.amigo)}</th>`:''}<th>${esc(r.yo)}</th></tr>${filas}</table>
+  <div class=row style="margin-top:10px">
+    <button class=mini onclick="pedirSalir()">Salir</button>
+    <button class=pri style="flex:2" onclick="volverAResumen()">← Volver</button>
+  </div>
+  <button style="width:100%;margin-top:8px" onclick="irInicio()">Volver al inicio</button>`;
+}
+
+function vTips(){
+  const bloque=(titulo,key)=>`
+    <div class="blk">
+      <div class="lbl">${titulo}</div>
+      ${[0,1,2,3,4].map(i=>`
+        <input value="${esc(db.tips[key][i]||'')}" placeholder="Tip ${i+1}" oninput="actualizarTip('${key}',${i},this.value)">
+      `).join('')}
+    </div>
+  `;
+  return `
+    <h1>TIPS</h1>
+    ${bloque('Rutina','rutina')}
+    ${bloque('S2+3','s23')}
+    ${bloque('APCH','apch')}
+    ${bloque('PUTTS','putts')}
+    <div class="bar">
+      <button class="go" onclick="volverTips()">← VOLVER</button>
+    </div>
+  `;
+}
+
+function sheet(){
+  if(salirSheet){
+    return `<div class=ov onclick="cancelarSalir()"></div><div class=sh><h3>¿Guardar la ronda?</h3>
+    <p style="font-size:14px;color:#636366;margin:0 0 10px">Tus datos ya quedan guardados en el celular igual. Guardar acá te deja ademas una copia en archivo, para tener un respaldo aparte.</p>
+    <button class=pri style="width:100%;margin-bottom:8px" onclick="confirmarSalirGuardando()">Sí, guardar copia y salir</button>
+    <button style="width:100%;margin-bottom:8px" onclick="confirmarSalirSinGuardar()">No, salir sin copia</button>
+    <button style="width:100%" onclick="cancelarSalir()">Cancelar</button>
+    </div>`;
+  }
+  if(editarObjetivosId){
+    const r=db.rondas[editarObjetivosId];
+    if(r){
+      const o=r.objetivo||{putt:33,apch:24,s23:28,pen:0};
+      return `<div class=ov onclick="cancelarEditarObj()"></div><div class=sh>
+      <h3>Editar objetivos</h3>
+      <p style="font-size:13px;color:#636366;margin:0 0 10px">Ronda: ${esc(r.yo)} · ${esc(r.cancha)}</p>
+      <label style="font-size:11px;font-weight:800;color:#636366">PUTT</label>
+      <input id=e_putt type=number min=0 value="${o.putt??33}">
+      <label style="font-size:11px;font-weight:800;color:#636366">APCH</label>
+      <input id=e_apch type=number min=0 value="${o.apch??24}">
+      <label style="font-size:11px;font-weight:800;color:#636366">S+2+3</label>
+      <input id=e_s23 type=number min=0 value="${o.s23??28}">
+      <label style="font-size:11px;font-weight:800;color:#636366">PEN</label>
+      <input id=e_pen type=number min=0 value="${o.pen??0}">
+      <button class=pri style="width:100%;margin-bottom:8px" onclick="guardarObjetivos()">Guardar objetivos</button>
+      <button style="width:100%" onclick="cancelarEditarObj()">Cancelar</button>
+      </div>`;
+    }
+  }
+  if(irA){
+    const r=R();
+    return `<div class=ov onclick="irA=false;render()"></div><div class=sh><h3>Ir al hoyo</h3><div class=gr>${[...Array(18)].map((_,i)=>`<button class="${i+1==r.hoyo?'sel':(r.h[i+1]&&r.h[i+1].ok)?'dn':''}" onclick="ir(${i+1})">${i+1}</button>`).join('')}</div></div>`;
+  }
+  if(picker){
+    const cur=H(R().hoyo)[picker.k],b=[];
+    for(let v=picker.min;v<=picker.max;v+=picker.step){
+      b.push(`<button class="${v==cur?'sel':''}" onclick="setv(${v})">${v}</button>`);
+    }
+    return `<div class=ov onclick="picker=null;render()"></div><div class=sh><h3>${picker.t}</h3><div class=gr>${b.join('')}</div></div>`;
+  }
+  return '';
+}
+
+function render(){
+  if((vista=='hoyo'||vista=='resumen'||vista=='control'||vista=='tips')&&!R())vista='home';
+  const y=window.scrollY;
+  let html;
+  if(vista=='home')html=vHome();
+  else if(vista=='tips')html=vTips();
+  else if(vista=='hoyo')html=vHoyo();
+  else if(vista=='resumen')html=vResumen();
+  else html=vControl();
+  $('app').innerHTML=html+sheet();
+  window.scrollTo(0,y);
+}
+
+if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();
+
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.getRegistrations().then(regs=>{
+    regs.forEach(r=>r.unregister());
+  });
+}
+
+vista='home';
+render();
+</script></body></html>
